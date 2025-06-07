@@ -1,4 +1,3 @@
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -26,10 +25,11 @@ public class OrderTest extends BaseTest {
     private final String date;
     private final String color;
     private final String comment;
+    private final boolean useTopButton;
 
     public OrderTest(String name, String surname, String address,
                      String metroStation, String phone, String date,
-                     String color, String comment) {
+                     String color, String comment, boolean useTopButton) {
         this.name = name;
         this.surname = surname;
         this.address = address;
@@ -38,42 +38,34 @@ public class OrderTest extends BaseTest {
         this.date = date;
         this.color = color;
         this.comment = comment;
+        this.useTopButton = useTopButton;
     }
 
     @Parameterized.Parameters
     public static Object[][] data() {
         return new Object[][]{
-                {"Макс", "Максимович", "ул. Автозаводская, 17", "Автозаводская", "+79991111111", "01.01.2025", "black", "Комментарий Тук Тук"},
-                {"Мария", "Мариновна", "пр. Садовый, 1", "Планерная", "+79992222222", "23.12.2025", "grey", "Комментарий ТУК ТУК"},
-                {"Алексей", "Алексеевич", "пер. Воробья, 1074", "Парк культуры", "+79993333333", "21.12.2024", "black", "Комментарий тук тук"}
+                {"Макс", "Максимович", "ул. Автозаводская, 17", "Автозаводская", "+79991111111", "01.01.2025", "black", "Комментарий Тук Тук", true},
+                {"Мария", "Мариновна", "пр. Садовый, 1", "Планерная", "+79992222222", "23.12.2025", "grey", "Комментарий ТУК ТУК", false},
+                {"Алексей", "Алексеевич", "пер. Воробья, 1074", "Парк культуры", "+79993333333", "21.12.2024", "black", "Комментарий тук тук", true}
         };
     }
 
     @Test
-    public void testHappyPathOrderByTopButton() {
+    public void testHappyPathOrder() {
         initializePageObjects();
-
         mainPage.clickCookieButton();
-        mainPage.clickOrderButtonTop();
-        assertOrderHeaderVisible();
-
-        orderPage.fillOrderForm(name, surname, address, metroStation, phone);
-        assertRentalHeaderVisible();
-
-        rentalPage.fillRentalForm(date, color, comment);
-        waitForConfirmButtonAndClick();
-        assertOrderConfirmationVisible();
+        if (useTopButton) {
+            mainPage.clickOrderButtonTop();
+        } else {
+            mainPage.goToAndClickBottomOrderButton();
+        }
+        completeOrderProcess();
     }
 
-    @Test
-    public void testHappyPathOrderByBottomButton() {
-        initializePageObjects();
-        mainPage.goToAndClickBottomOrderButton();
+    private void completeOrderProcess() {
         assertOrderHeaderVisible();
-
         orderPage.fillOrderForm(name, surname, address, metroStation, phone);
         assertRentalHeaderVisible();
-
         rentalPage.fillRentalForm(date, color, comment);
         waitForConfirmButtonAndClick();
         assertOrderConfirmationVisible();
@@ -86,15 +78,15 @@ public class OrderTest extends BaseTest {
     }
 
     private void assertOrderHeaderVisible() {
-        assertTrue("Заголовок заказа отображаеться", orderPage.isOrderHeaderVisible());
+        assertTrue("Заголовок заказа должен отображаться", orderPage.isOrderHeaderVisible());
     }
 
     private void assertRentalHeaderVisible() {
-        assertTrue("Заголовок аренды отображаеться", rentalPage.isRentalHeaderVisible());
+        assertTrue("Заголовок аренды должен отображаться", rentalPage.isRentalHeaderVisible());
     }
 
     private void assertOrderConfirmationVisible() {
-        assertTrue("Подтверждение заказа отображаеться", rentalPage.isOrderConfirmationVisible());
+        assertTrue("Подтверждение заказа должно отображаться", rentalPage.isOrderConfirmationVisible());
     }
 
     private void waitForConfirmButtonAndClick() {

@@ -7,54 +7,45 @@ import org.openqa.selenium.WebElement;
 
 public class MainPage {
     private final WebDriver driver;
-    private static final By orderButtonTop = By.className("Button_Button__ra12g");
-    private static final By orderButtonBottom = By.xpath("//div[contains(@class, 'Home_ThirdPart__LSTEE')]//button[text()='Заказать']");
-    private static final By cookieButton = By.className("App_CookieButton__3cvqF");
+    private static final By COOKIE_BUTTON = By.className("App_CookieButton__3cvqF");
+    private static final By ORDER_BUTTON_TOP = By.className("Button_Button__ra12g");
+    private static final By ORDER_BUTTON_BOTTOM = By.xpath("//div[contains(@class, 'Home_ThirdPart__LSTEE')]//button[text()='Заказать']");
 
     public MainPage(WebDriver driver) {
         this.driver = driver;
     }
 
-    private By getQuestionLocator(int questionIndex) {
-        return By.id("accordion__heading-" + (questionIndex - 1));
+    public By getAnswerLocator(int index) {
+        return By.id("accordion__panel-" + index);
     }
 
-    public By getAnswerLocator(int answerIndex) {
-        return By.id("accordion__panel-" + (answerIndex - 1));
-    }
-
-    public void clickQuestion(int questionIndex) {
-        WebElement element = driver.findElement(getQuestionLocator(questionIndex));
+    public void clickQuestion(int index) {
+        By questionLocator = By.id("accordion__heading-" + index);
+        WebElement element = driver.findElement(questionLocator);
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
         element.click();
     }
 
-    public boolean isAnswerVisible(int answerIndex) {
-        return driver.findElement(getAnswerLocator(answerIndex)).isDisplayed();
+    public boolean isAnswerVisible(int index) {
+        return driver.findElement(getAnswerLocator(index)).isDisplayed();
     }
 
-    public void clickOrderButtonTop() {
-        driver.findElement(orderButtonTop).click();
-    }
-
-    public void clickOrderButtonBottom() {
-        WebElement element = driver.findElement(orderButtonBottom);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
-        element.click();
-    }
-
-    public void scrollToOrderButtonBottom() {
-        WebElement element = driver.findElement(orderButtonBottom);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+    public String getAnswerText(int index) {
+        return driver.findElement(getAnswerLocator(index)).getText().trim();
     }
 
     public void clickCookieButton() {
-        driver.findElement(cookieButton).click();
+        driver.findElement(COOKIE_BUTTON).click();
+    }
+
+    public void clickOrderButtonTop() {
+        driver.findElement(ORDER_BUTTON_TOP).click();
     }
 
     public void goToAndClickBottomOrderButton() {
         clickCookieButton();
-        scrollToOrderButtonBottom();
-        clickOrderButtonBottom();
+        WebElement element = driver.findElement(ORDER_BUTTON_BOTTOM);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+        element.click();
     }
 }
